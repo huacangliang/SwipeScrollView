@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lazymc.swipescrollview.MainActivity">
+
+    <com.lazymc.swipescrollview.SwipeScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#ffffff">
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:tag="@string/swipe_content_tag"
+            android:background="#cccccc"/>
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#ff4ceb"
+            android:textColor="#ffffff"
+            android:text="删除"
+            android:gravity="center"/>
+    </com.lazymc.swipescrollview.SwipeScrollView>
+</RelativeLayout>
