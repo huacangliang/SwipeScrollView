@@ -35,21 +35,28 @@ public class MainActivity extends AppCompatActivity {
             holder.itemView.findViewById(R.id.tv_collect).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "收藏", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), "收藏", Toast.LENGTH_SHORT).show();
                 }
             });
             holder.itemView.findViewById(R.id.tv_follower).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "关注", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), "关注", Toast.LENGTH_SHORT).show();
                 }
             });
             holder.itemView.findViewById(R.id.tv_del).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "删除", Toast.LENGTH_LONG).show();
+                    Toast.makeText(v.getContext(), "删除", Toast.LENGTH_SHORT).show();
                     size--;
                     notifyDataSetChanged();
+                }
+            });
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "txt", Toast.LENGTH_SHORT).show();
                 }
             });
         }

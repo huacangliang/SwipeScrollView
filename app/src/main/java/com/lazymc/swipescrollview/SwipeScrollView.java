@@ -3,7 +3,9 @@ package com.lazymc.swipescrollview;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -29,6 +31,8 @@ public class SwipeScrollView extends FrameLayout {
     private int mMinimumVelocity;
     private int mMaximumVelocity;
     private VelocityTracker mVelocityTracker;
+    private boolean isScroller = false;//是否滑动中
+    private boolean isVerticScroll;//是否垂直方向滚动
 
     public SwipeScrollView(Context context) {
         super(context);
@@ -54,7 +58,7 @@ public class SwipeScrollView extends FrameLayout {
         if (child.getTag().toString().equals(getResources().getString(R.string.swipe_content_tag))) {
             mContentView = child;
             mScroller = new Scroller(getContext());
-            mTouchSlop = ViewConfiguration.get(getContext()).getScaledPagingTouchSlop();
+            mTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
             mMinimumVelocity = ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity();
 
             mMaximumVelocity = ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity();
@@ -81,6 +85,14 @@ public class SwipeScrollView extends FrameLayout {
     }
 
     @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if ((visibility == INVISIBLE || visibility == GONE) && getScrollX() != 0) {
+            close();
+        }
+    }
+
+    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         return super.dispatchTouchEvent(ev);
     }
@@ -95,16 +107,28 @@ public class SwipeScrollView extends FrameLayout {
                 mFastY = ev.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                mX = ev.getRawX();
-                mLastX = mX;
-                float diff = Math.abs(mX - mLastX);
-                if (diff > mTouchSlop) {
-                    return true;
+                if (Math.abs(ev.getRawY() - mFastY) > mTouchSlop) {
+                    isVerticScroll = true;
+                    mFastY = ev.getRawY();
+                    return super.onInterceptTouchEvent(ev);
                 }
+                mFastY = ev.getRawY();
+                isVerticScroll = false;
+                mX = ev.getRawX();
+                float diff = Math.abs(mX - mLastX);
+                mLastX = mX;
+                if (diff > mTouchSlop || ev.getEventTime() - ev.getDownTime() > 115) {
+                    return isScroller = true;
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+            default:
+                isScroller = false;
                 break;
         }
 
-        return true;
+        return super.onInterceptTouchEvent(ev);
     }
 
     @Override
@@ -120,39 +144,116 @@ public class SwipeScrollView extends FrameLayout {
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
         obtainVelocityTracker(event);
+        Log.d(TAG, "onTouchEvent: " + event);
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mScroller.abortAnimation();
+                mFastY=event.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
+
                 mX = event.getRawX();
                 int scrollX = (int) (mLastX - mX);
+                mLastX = mX;
+                if (Math.abs(event.getRawY() - mFastY) > Math.abs(scrollX)) {
+                    mFastY=event.getRawY();
+                    return false;
+                }
+                mFastY=event.getRawY();
+                requestDisallowInterceptTouchEvent(true);
                 if (getScrollX() + scrollX < leftBord) {
-                    scrollTo(leftBord, 0);
+                    close();
+                    isScroller = true;
                     return true;
                 }
                 scrollBy(scrollX, 0);
-                mLastX = mX;
+                isScroller = true;
                 break;
             case MotionEvent.ACTION_UP:
-                if (getScrollX() > 0 && getScrollX() >= rightBord - getWidth()) {
-                    //mScroller.setFinalX(getWidth());
-                    mScroller.extendDuration(100);
-                    mScroller.startScroll(getScrollX(), getScrollY(), -(getScrollX() - (rightBord - getWidth())), 0);
-                    invalidate();
-                }else{
-                    VelocityTracker velocityTracker = mVelocityTracker;
-                    velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
-                    int hX = (int) velocityTracker.getXVelocity();
-                    if ((Math.abs(hX) > mMinimumVelocity)) {
-                        mScroller.fling(getScrollX(), getScrollY(), -hX, 0, 0, rightBord-getWidth(), 0, 0);
-                        invalidate();
-                    }
-                }
-                releaseVelocityTracker();
-                break;
+                if (!isVerticScroll)
+                    up(event);
+                return false;
         }
         return true;
+    }
+
+    /**
+     * 滚动后点击内容区域时恢复原始位置操作
+     *
+     * @param event
+     * @return
+     */
+    public boolean up(MotionEvent event) {
+        if (!isScroller && getScrollX() != 0) {
+            close();
+            return true;
+        }
+        //点击要操作的item项功能
+        if (!isScroller && getScrollX() == 0) {
+            Object v = getParent();
+            if (v != null) {
+                ViewGroup vg = (ViewGroup) v;
+                vg.performClick();
+            }
+            return true;
+        }
+
+        VelocityTracker velocityTracker = mVelocityTracker;
+        velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
+        int hX = (int) velocityTracker.getXVelocity();
+        Log.d(TAG, "up: " + hX);
+        if (getScrollX() > 0) {
+            mScroller.extendDuration(100);
+            int diff = 0;
+            if (getScrollX() >= (rightBord - getWidth()) / 2) {
+                diff = -(getScrollX() - (rightBord - getWidth()));
+                mScroller.startScroll(getScrollX(), getScrollY(), diff, 0);
+                invalidate();
+                Log.d(TAG, "up: __");
+            } else {
+                if (hX>=-1000){
+                    close();
+                }else {
+                    mScroller.fling(getScrollX(), getScrollY(), -hX, 0, 0, rightBord - getWidth(), 0, 0);
+                    invalidate();
+                }
+                Log.d(TAG, "up: _|");
+            }
+        } else {
+            if (hX > mMinimumVelocity) {
+                mScroller.fling(getScrollX(), getScrollY(), -hX, 0, 0, rightBord - getWidth(), 0, 0);
+                invalidate();
+                Log.d(TAG, "up: __||");
+            }
+        }
+        releaseVelocityTracker();
+        isScroller = false;
+        return false;
+    }
+
+    public void close() {
+        if (getScrollX() != 0) {
+            mScroller.startScroll(getScrollX(), getScrollY(), -(getScrollX()), 0);
+            invalidate();
+        } else {
+            scrollTo(leftBord, 0);
+        }
+    }
+
+    public View findChildViewUnder(float x, float y) {
+        final int count = getChildCount();
+        for (int i = count - 1; i >= 0; i--) {
+            final View child = getChildAt(i);
+            final float translationX = ViewCompat.getTranslationX(child);
+            final float translationY = ViewCompat.getTranslationY(child);
+            if (x >= child.getLeft() + translationX &&
+                    x <= child.getRight() + translationX &&
+                    y >= child.getTop() + translationY &&
+                    y <= child.getBottom() + translationY) {
+                return child;
+            }
+        }
+        return null;
     }
 
     private void obtainVelocityTracker(MotionEvent event) {
