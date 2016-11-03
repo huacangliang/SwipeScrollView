@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -99,13 +98,10 @@ public class SwipeScrollView extends FrameLayout {
                 mX = ev.getRawX();
                 mLastX = mX;
                 float diff = Math.abs(mX - mLastX);
-                if (diff > mTouchSlop && (diff > Math.abs(ev.getRawY() - mFastY))) {
+                if (diff > mTouchSlop) {
                     return true;
                 }
                 break;
-        }
-        if (super.onInterceptTouchEvent(ev)) {
-            return false;
         }
 
         return true;
@@ -139,18 +135,18 @@ public class SwipeScrollView extends FrameLayout {
                 mLastX = mX;
                 break;
             case MotionEvent.ACTION_UP:
-                if (getScrollX() > 0&&getScrollX()>rightBord-getWidth()) {
+                if (getScrollX() > 0 && getScrollX() >= rightBord - getWidth()) {
+                    //mScroller.setFinalX(getWidth());
+                    mScroller.extendDuration(100);
+                    mScroller.startScroll(getScrollX(), getScrollY(), -(getScrollX() - (rightBord - getWidth())), 0);
+                    invalidate();
+                }else{
                     VelocityTracker velocityTracker = mVelocityTracker;
                     velocityTracker.computeCurrentVelocity(1000, mMaximumVelocity);
                     int hX = (int) velocityTracker.getXVelocity();
                     if ((Math.abs(hX) > mMinimumVelocity)) {
-                        mScroller.fling(getScrollX(), getScrollY(), hX, 0, getWidth(), rightBord, 0, 0);
+                        mScroller.fling(getScrollX(), getScrollY(), -hX, 0, 0, rightBord-getWidth(), 0, 0);
                         invalidate();
-                        Log.d(TAG, "onTouchEvent: 1");
-                    }else{
-                        mScroller.startScroll(getScrollX(),getScrollY(),-(rightBord-getWidth()),0);
-                        invalidate();
-                        Log.d(TAG, "onTouchEvent: 2");
                     }
                 }
                 releaseVelocityTracker();

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <com.lazymc.swipescrollview.SwipeScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="#ffffff">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#cccccc"
+            android:tag="@string/swipe_content_tag">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="test"
+                android:textColor="#ffffff"/>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_collect"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#ff660b"
+            android:gravity="center"
+            android:text="收藏"
+            android:textColor="#ffffff"/>
+
+        <TextView
+            android:id="@+id/tv_follower"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#ff4ceb"
+            android:gravity="center"
+            android:text="关注"
+            android:textColor="#ffffff"/>
+
+        <TextView
+            android:id="@+id/tv_del"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="#ff000b"
+            android:gravity="center"
+            android:text="删除"
+            android:textColor="#ffffff"/>
+    </com.lazymc.swipescrollview.SwipeScrollView>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffffff"/>
+</LinearLayout>

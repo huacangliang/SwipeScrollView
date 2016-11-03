@@ -7,21 +7,10 @@
     android:layout_height="match_parent"
     tools:context="com.lazymc.swipescrollview.MainActivity">
 
-    <com.lazymc.swipescrollview.SwipeScrollView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_content"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="#ffffff">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:tag="@string/swipe_content_tag"
-            android:background="#cccccc"/>
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:background="#ff4ceb"
-            android:textColor="#ffffff"
-            android:text="删除"
-            android:gravity="center"/>
-    </com.lazymc.swipescrollview.SwipeScrollView>
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
 </RelativeLayout>
