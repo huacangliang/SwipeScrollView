@@ -3,7 +3,7 @@
 
 使用方法
 
-        <com.lazymc.swipescrollview.SwipeScrollView
+        <com.lazymc.swipelibrary.SwipeScrollView
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:background="#ffffff">
@@ -51,7 +51,7 @@
             android:gravity="center"
             android:text="删除"
             android:textColor="#ffffff"/>
-        </com.lazymc.swipescrollview.SwipeScrollView>
+        </com.lazymc.swipelibrary.SwipeScrollView>
     
     内容容器需要设置tag
     

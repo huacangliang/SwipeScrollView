@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">SwipeScrollView</string>
-    <string name="swipe_content_tag">swipe_content_view</string>
 </resources>

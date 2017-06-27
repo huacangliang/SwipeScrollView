@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+/**
+ * @author huacangliang
+ * github:https://github.com/huacangliang/SwipeScrollView
+ */
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView rv_content;
