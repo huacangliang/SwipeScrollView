@@ -1,4 +1,4 @@
-package com.lazymc.swipelibrary;
+package com.lazymc.swipe;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
